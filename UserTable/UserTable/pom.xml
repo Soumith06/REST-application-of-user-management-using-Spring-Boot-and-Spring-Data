@@ -8,7 +8,7 @@
 		<version>2.6.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>net.UserManagement</groupId>
+	<groupId>net.UserData</groupId>
 	<artifactId>UserTable</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>UserTable</name>
