@@ -1,9 +1,13 @@
 package net.UserData.UserTable.Controller;
 
-
+//include exception handling
 import net.UserData.UserTable.Service.UserService;
+import net.UserData.UserTable.exceptions.UserAlreadyExistsException;
+import net.UserData.UserTable.exceptions.UserNotFoundException;
 import net.UserData.UserTable.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,50 +19,46 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public List<User> GetAllUser(){
-        return userService.getAllUsers();
-    }
-
-    @GetMapping("{id}")
-    public String GetById(@PathVariable String id) {
-        if(userService.searchByUser(id)){
-            return userService.getById(id);
-        }
-        else{
-            return "User not found";
-        }
-    }
-
     @PostMapping
-    public String CreateUser(@RequestBody User user){
-        if(userService.checkUser(user)) {
-            return "User Already exists";
+    public ResponseEntity<?> addUser(@RequestBody User user){
+        try{
+            User newUser=userService.addUser(user);
+            return new ResponseEntity<User>(newUser,HttpStatus.CREATED);
         }
-        else {
-            userService.createUser(user);
-            return "user saved";
-        }
-    }
-    @PutMapping("{id}")
-    public String UpdateUser(@RequestBody User user,@PathVariable String id) {
-        if(userService.searchByUser(id)) {
-            userService.updateUser(user, id);
-            return "Updated";
-        }
-        else {
-            return "User not found";
+        catch (UserAlreadyExistsException userAlreadyExistsException){
+            return new ResponseEntity<String>(userAlreadyExistsException.getMessage(),HttpStatus.CONFLICT);
         }
     }
-    @DeleteMapping("{id}")
-    public String DeleteUser(@PathVariable String id){
-        if(userService.searchByUser(id)) {
-            userService.deleteUser(id);
-            return "deleted";
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUser(){
+        List<User> listOfAllUsers = userService.getAllUsers();
+        return new ResponseEntity<List<User>>(listOfAllUsers,HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOneUser(@PathVariable Long id){
+
+        try{
+            User User=userService.getOneUser(id);
+            return new ResponseEntity<User>(User,HttpStatus.OK);
         }
-        else {
-            return "User not found";
+        catch (UserNotFoundException userNotFoundException){
+            return new ResponseEntity<String>(userNotFoundException.getMessage(),HttpStatus.CONFLICT);
         }
 
+
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id,@RequestBody User user){
+        User updatedUser=userService.updateUser(user,id);
+        return new ResponseEntity<User>(updatedUser,HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id){
+        userService.deleteUser(id);
+        return new ResponseEntity<String>("user deleted",HttpStatus.ACCEPTED);
     }
 }
