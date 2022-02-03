@@ -31,9 +31,14 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUser(){
-        List<User> listOfAllUsers = userService.getAllUsers();
-        return new ResponseEntity<List<User>>(listOfAllUsers,HttpStatus.OK);
+    public ResponseEntity<?> getAllUser(){
+        try{
+            List<User> listOfAllUsers = userService.getAllUsers();
+            return new ResponseEntity<List<User>>(listOfAllUsers,HttpStatus.OK);
+        }
+        catch (UserNotFoundException userNotFoundException){
+            return new ResponseEntity<String>(userNotFoundException.getMessage(),HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("/{id}")
@@ -51,14 +56,27 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id,@RequestBody User user){
-        User updatedUser=userService.updateUser(user,id);
-        return new ResponseEntity<User>(updatedUser,HttpStatus.CREATED);
+    public ResponseEntity<?> updateUser(@PathVariable Long id,@RequestBody User user){
+        try{
+            User updatedUser=userService.updateUser(user,id);
+            return new ResponseEntity<User>(updatedUser,HttpStatus.CREATED);
+        }
+        catch (UserAlreadyExistsException userAlreadyExistsException){
+            return new ResponseEntity<String>(userAlreadyExistsException.getMessage(),HttpStatus.CONFLICT);
+        }
+        catch (UserNotFoundException userNotFoundException){
+            return new ResponseEntity<String>(userNotFoundException.getMessage(),HttpStatus.CONFLICT);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
-        userService.deleteUser(id);
-        return new ResponseEntity<String>("user deleted",HttpStatus.ACCEPTED);
+        try {
+            userService.deleteUser(id);
+            return new ResponseEntity<String>("user deleted",HttpStatus.ACCEPTED);
+        }
+        catch (UserNotFoundException userNotFoundException){
+            return new ResponseEntity<String>(userNotFoundException.getMessage(),HttpStatus.CONFLICT);
+        }
     }
 }

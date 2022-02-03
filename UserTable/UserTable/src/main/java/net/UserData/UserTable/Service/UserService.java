@@ -17,13 +17,18 @@ public class UserService {
 
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        if(userRepository.findAll().isEmpty()){
+            throw new UserNotFoundException("User List is empty");
+        }
+        else{
+            return userRepository.findAll();
+        }
     }
 
     public boolean validateUser(User user){
         List<User> usersList=userRepository.findAll();
         for(User existingUser:usersList){
-            if(user.getUserName()==existingUser.getUserName() || user.getEmailID()==existingUser.getEmailID() || user.getMobileNumber()==existingUser.getMobileNumber()){
+            if(user.getUserName().equals(existingUser.getUserName()) || user.getEmailID().equals(existingUser.getEmailID()) || user.getMobileNumber().equals(existingUser.getMobileNumber())){
                 return true;
             }
         }
@@ -51,7 +56,7 @@ public class UserService {
     public void deleteUser(Long id) {
 
         if(userRepository.findById(id).isEmpty()){
-            throw new UserNotFoundException("User NotFound");
+            throw new UserNotFoundException("User Not Found");
         }
         else{
             userRepository.deleteById(id);
@@ -60,17 +65,23 @@ public class UserService {
     }
 
     public User updateUser(User user,Long id) {
-        List<User> usersList=userRepository.findAll();
-        for(User existingUser:usersList){
-            if(user.getUserName().equals(existingUser.getUserName()) || user.getEmailID().equals(existingUser.getEmailID()) || user.getMobileNumber().equals(existingUser.getMobileNumber())){
-                throw new UserAlreadyExistsException("UserAlreadyExists");
-            }
-        }
         if(userRepository.findById(id).isEmpty()){
-            throw new UserNotFoundException("UserNotFound");
+            throw new UserNotFoundException("User Not Found");
         }
         else{
             User existingUser=userRepository.findById(id).get();
+            List<User> usersList=userRepository.findAll();
+            for(User existingUserinList:usersList){
+                if(!(existingUser.getUserName().equals(user.getUserName())) && user.getUserName().equals(existingUserinList.getUserName())){
+                    throw new UserAlreadyExistsException("UserNameAlreadyExists");
+                }
+                if(!(existingUser.getEmailID().equals(user.getEmailID())) && user.getEmailID().equals(existingUserinList.getEmailID())){
+                    throw new UserAlreadyExistsException("EmailIDAlreadyExists");
+                }
+                if(!(existingUser.getMobileNumber().equals(user.getMobileNumber())) && user.getMobileNumber().equals(existingUserinList.getMobileNumber())){
+                    throw new UserAlreadyExistsException("MobileNumberAlreadyExists");
+                }
+            }
             existingUser.setUserName(user.getUserName());
             existingUser.setAddress1(user.getAddress1());
             existingUser.setAddress2(user.getAddress2());
@@ -78,8 +89,7 @@ public class UserService {
             existingUser.setFirstName(user.getFirstName());
             existingUser.setLastName(user.getLastName());
             existingUser.setMobileNumber(user.getMobileNumber());
-
-            return existingUser;
+            return userRepository.save(existingUser);
         }
 
     }

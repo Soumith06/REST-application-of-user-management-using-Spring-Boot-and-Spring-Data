@@ -1,5 +1,6 @@
 package net.UserData.UserTable.model;
 
+import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GeneratorType;
@@ -13,10 +14,13 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
+    @NotNull
     private String userName;
     private String firstName;
     private String lastName;
+    @NotNull
     private String mobileNumber;
+    @NotNull
     private String emailID;
     private String address1;
     private String address2;
