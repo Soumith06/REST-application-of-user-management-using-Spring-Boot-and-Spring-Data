@@ -18,7 +18,7 @@ public class UserService {
 
     public List<User> getAllUsers() {
         if(userRepository.findAll().isEmpty()){
-            throw new UserNotFoundException("User List is empty");
+            throw new UserNotFoundException("Users List is empty");
         }
         else{
             return userRepository.findAll();
@@ -36,7 +36,7 @@ public class UserService {
     }
     public User addUser(User user) {
         if(validateUser(user)){
-            throw  new UserAlreadyExistsException("UserAlreadyExists");
+            throw  new UserAlreadyExistsException("User Already Exists");
         }
         else{
             return userRepository.save(user);

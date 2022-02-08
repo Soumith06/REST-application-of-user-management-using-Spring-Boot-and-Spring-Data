@@ -2,7 +2,6 @@ package net.UserData.UserTable;
 
 import net.UserData.UserTable.Repository.UserRepository;
 import net.UserData.UserTable.Service.UserService;
-import net.UserData.UserTable.exceptions.UserNotFoundException;
 import net.UserData.UserTable.model.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,6 +26,8 @@ public class UserServiceTest {
     @MockBean
     private UserRepository userRepository;
 
+    User newUser=new User(0L,"sou06","soum","g","10","d@gmail.com","warangal","telangana");
+    User user=new User(0L,"sou06","sou","g","10","d@gmail.com","warangal","telangana");
 
     @Test
     public void getAllUsersTest(){
@@ -45,7 +46,6 @@ public class UserServiceTest {
 
     @Test
     public void deleteUserTest(){
-        User user=new User(0L,"sou06","sou","g","10","d@gmail.com","warangal","telangana");
         Mockito.when(userRepository.findById(0l)).thenReturn(Optional.of(user));
         userService.deleteUser(0L);
         Mockito.verify(userRepository,Mockito.times(1)).deleteById(0L);
@@ -53,8 +53,6 @@ public class UserServiceTest {
 
     @Test
     public void updateUserTest(){
-        User newUser=new User(0L,"sou06","soum","g","10","d@gmail.com","warangal","telangana");
-        User user=new User(0L,"sou06","sou","g","10","d@gmail.com","warangal","telangana");
         Mockito.when(userRepository.findById(0l)).thenReturn(Optional.of(user));
         Mockito.when(userRepository.save(user)).thenReturn(newUser);
         Assertions.assertEquals(newUser,userService.updateUser(newUser,0L));
@@ -62,7 +60,6 @@ public class UserServiceTest {
 
     @Test
     public void getOneUserTest(){
-        User user=new User(0L,"sou06","sou","g","10","d@gmail.com","warangal","telangana");
         Mockito.when(userRepository.findById(0L)).thenReturn(Optional.of(user));
         Assertions.assertEquals(user,userService.getOneUser(0L));
     }
